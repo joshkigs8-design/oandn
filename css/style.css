@@ -399,8 +399,10 @@ a {
 
 .lookbook-item img {
     width: 100%;
-    height: clamp(180px, 35vw, 250px);
-    object-fit: cover;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    background: var(--color-bg-primary);
     transition: var(--transition);
 }
 
@@ -1942,6 +1944,7 @@ small {
     
     .hamburger {
         display: flex;
+        z-index: 10001;
     }
     
     .nav-list {
@@ -1957,6 +1960,7 @@ small {
         padding: 20px 0;
         gap: 20px;
         border-bottom: 1px solid rgba(201, 168, 106, 0.15);
+        z-index: 10000;
     }
     
     .nav-list.active {
