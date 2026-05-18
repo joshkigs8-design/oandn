@@ -220,13 +220,12 @@ a {
 
 /* Hero Section */
 .hero {
-    min-height: 100vh;
-    height: 100vh;
+    min-height: 100dvh;
+    height: 100dvh;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: env(safe-area-inset-top);
     margin-top: 0;
     background: linear-gradient(135deg, var(--color-bg-primary), var(--color-accent-maroon));
 }
@@ -2071,7 +2070,7 @@ small {
     
     /* Hero fixes for mobile */
     .hero {
-        min-height: calc(100vh - 70px);
+        min-height: calc(100dvh - 70px);
         height: auto;
         padding-top: 70px;
     }
