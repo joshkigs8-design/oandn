@@ -222,7 +222,7 @@ a {
 
 /* Hero Section */
 .hero {
-    min-height: calc(100vh - 70px);
+    min-height: 100vh;
     height: 100vh;
     position: relative;
     display: flex;
@@ -347,7 +347,7 @@ a {
 
 /* Brand Statement */
 .brand-statement {
-    padding: 100px 0;
+    padding: 80px 0;
     background-color: var(--color-bg-primary);
     text-align: center;
 }
@@ -377,13 +377,13 @@ a {
 
 /* Lookbook Section */
 .lookbook-section {
-    padding: 100px 0;
+    padding: 80px 0;
     background-color: var(--color-bg-accent);
 }
 
 .lookbook-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 
@@ -394,7 +394,7 @@ a {
 
 .lookbook-item img {
     width: 100%;
-    height: 300px;
+    height: 250px;
     object-fit: cover;
     transition: var(--transition);
 }
@@ -405,13 +405,13 @@ a {
 
 /* Why Us Section */
 .why-us-section {
-    padding: 100px 0;
+    padding: 80px 0;
     background-color: var(--color-bg-primary);
 }
 
 .why-us-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
     gap: 30px;
 }
 
@@ -1085,9 +1085,14 @@ a {
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
-.analytics-grid {
-        grid-template-columns: 1fr;
+@media (min-width: 768px) {
+    .lookbook-grid,
+    .why-us-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .collections-grid {
+        grid-template-columns: 1fr 1fr 1fr;
     }
 }
 
@@ -2029,7 +2034,7 @@ small {
         flex-direction: column;
         gap: 30px;
     }
-
+    
     .footer-info {
         text-align: center;
     }
@@ -2044,19 +2049,57 @@ small {
     
     .collection-card img,
     .lookbook-item img {
-        height: 200px;
+        height: 180px;
     }
     
     .brand-statement h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+    
+    .brand-statement p {
+        font-size: 1rem;
     }
     
     .cta-banner h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+    
+    .cta-banner {
+        padding: 80px 0;
+    }
+    
+    .newsletter-section {
+        padding: 80px 0;
     }
     
     .newsletter-form {
         flex-direction: column;
+    }
+    
+    /* Hero fixes for mobile */
+    .hero {
+        min-height: calc(100vh - 70px);
+        height: auto;
+        padding-top: 70px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 12px 30px;
+        font-size: 0.9rem;
     }
 }
 
@@ -2068,11 +2111,36 @@ small {
     }
     
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
     
     .hero-subtitle {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .brand-statement h2 {
+        font-size: 1.5rem;
+    }
+    
+    .brand-statement p {
+        font-size: 0.9rem;
+    }
+    
+    .cta-banner h2 {
+        font-size: 1.5rem;
+    }
+    
+    .newsletter-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
     }
 }
 
