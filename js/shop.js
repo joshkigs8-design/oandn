@@ -154,12 +154,10 @@ function initHamburger() {
     const navList = document.querySelector('.nav-list');
     
     if (hamburger && navList) {
-        hamburger.style.display = 'flex';
-        hamburger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navList.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
+        // Ensure hamburger is visible on mobile
+        if (window.innerWidth <= 768) {
+            hamburger.style.display = 'flex';
+        }
         
         // Close menu when clicking a link
         navList.querySelectorAll('a').forEach(link => {
@@ -167,14 +165,6 @@ function initHamburger() {
                 navList.classList.remove('active');
                 hamburger.classList.remove('active');
             });
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!hamburger.contains(e.target) && !navList.contains(e.target)) {
-                navList.classList.remove('active');
-                hamburger.classList.remove('active');
-            }
         });
     }
 }

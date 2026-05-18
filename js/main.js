@@ -80,7 +80,8 @@ const hamburger = document.querySelector('.hamburger');
 const navList = document.querySelector('.nav-list');
 
 if (hamburger && navList) {
-    hamburger.addEventListener('click', () => {
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
         navList.classList.toggle('active');
         hamburger.classList.toggle('active');
     });
@@ -89,11 +90,19 @@ if (hamburger && navList) {
 // Close mobile menu when clicking a link
 document.querySelectorAll('.nav-list a').forEach(link => {
     link.addEventListener('click', () => {
-        if (navList.classList.contains('active')) {
+        if (navList && navList.classList.contains('active')) {
             navList.classList.remove('active');
-            hamburger?.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
         }
     });
+});
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (hamburger && navList && !hamburger.contains(e.target) && !navList.contains(e.target)) {
+        navList.classList.remove('active');
+        hamburger.classList.remove('active');
+    }
 });
 
 // Header scroll effect
