@@ -1967,6 +1967,22 @@ small {
         right: 0;
     }
     
+    /* Admin Panel Mobile Fixes */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
     .shop-hero h1,
     .about-hero-content h1,
     .contact-hero-content h1,
@@ -2243,6 +2259,15 @@ small {
     margin-bottom: 30px;
 }
 
+.admin-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .stat-card {
     background-color: var(--color-bg-accent);
     padding: 25px;
@@ -2270,6 +2295,7 @@ small {
 
 .admin-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 30px;
 }
