@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product - O & N FITS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800;900&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Montserrat:wght@200;300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <h2>O & N FITS</h2>
+            <p class="tagline">Product View</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo"><a href="index.html">O & N FITS</a></div>
+            <nav>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+<!-- Product Page -->
+    <section class="product-page">
+        <div class="container">
+            <div class="product-content">
+                <div class="product-image-container">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/600x600/4A0F1B/C9A86A?text=Loading..." alt="Product" id="productImg">
+                    </div>
+                    <div class="image-overlay"></div>
+                </div>
+                <div class="product-info">
+                    <h1 class="product-name">Loading...</h1>
+                    <p class="product-collection">Collection • Custom Made</p>
+                    <p class="product-price">KSH 0</p>
+                    <div class="product-description">
+                        <p>Premium custom-made luxury streetwear crafted to your specifications.</p>
+                    </div>
+                    <div class="size-selector">
+                        <label>Available Sizes <a href="#" class="size-guide-link">Size Guide</a></label>
+                        <div class="sizes">
+                            <!-- Sizes will be dynamically inserted -->
+                        </div>
+                        <div class="selected-size-display" id="selectedSizeDisplay">
+                            Selected: <span id="selectedSizeText">None</span>
+                        </div>
+                    </div>
+                    <div class="inclusivity-note">
+                        <p>&#9888; Every item is custom-made to order. Available in sizes XS-5XL and youth sizes 8-18. Gender-neutral options available.</p>
+                    </div>
+                    <a href="#" class="btn-whatsapp" target="_blank">
+                        Order via WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+</section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>O & N FITS</h3>
+                    <p>Presence in Every Fit.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-info">
+                    <h4>Location</h4>
+                    <p>Rupas Business Park, Eldoret</p>
+                    <h4>Contact</h4>
+                    <p>WhatsApp: <a href="https://wa.me/254112854091" target="_blank">0112854091</a></p>
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/brand_oandnfits?igsh=bnBucWNzaHh4dnBv" target="_blank">IG</a>
+                        <a href="https://tiktok.com/@oandnfits" target="_blank">TT</a>
+                        <a href="https://facebook.com/oandnfits" target="_blank">FB</a>
+                        <a href="https://wa.me/254112854091" target="_blank">WA</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 O & N FITS. All rights reserved.</p>
+                <p><a href="https://wa.me/254742868209" target="_blank" style="color: var(--color-accent-gold); text-decoration: none;">Designed by Codevanta</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">&#8593;</button>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin-api.js"></script>
+    <script src="js/product.js"></script>
+</body>
+</html>
