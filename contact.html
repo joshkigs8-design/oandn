@@ -208,19 +208,22 @@
         
         function renderReviews(reviews) {
             const list = document.getElementById('reviewsList');
-            list.innerHTML = reviews.map(r => `
+            list.innerHTML = reviews.map(r => {
+                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                return `
                 <div class="review-item">
                     <div class="review-header">
-                        <span class="review-rating">${'?'.repeat(r.rating)}</span>
+                        <span class="review-rating">${stars}</span>
                         <span class="verified-badge">Verified Buyer</span>
                     </div>
                     <p class="review-content">${r.content || r.review_text}</p>
                     <div class="review-author">
                         <strong>${r.customer_name || 'Anonymous'}</strong>
-                        <span class="review-date">� ${new Date(r.created_at).toLocaleDateString()}</span>
+                        <span class="review-date">· ${new Date(r.created_at).toLocaleDateString()}</span>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         function setupReviewForm() {
