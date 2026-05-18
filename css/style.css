@@ -33,7 +33,7 @@ body {
     z-index: 0;
 }
 
-/* Animated gradient overlay */
+/* Animated gradient overlay - disabled on iOS for performance */
 body::before {
     content: '';
     position: fixed;
@@ -55,9 +55,18 @@ body::before {
     }
 }
 
+@supports not (-webkit-touch-callout: none) {
+    @media (max-width: 768px) {
+        body::before {
+            animation: none;
+        }
+    }
+}
+
 main {
     position: relative;
     z-index: 2;
+    padding-top: 90px;
 }
 
 @keyframes gradientShift {
@@ -159,6 +168,8 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 10;
 }
 
 .logo a {
@@ -176,17 +187,44 @@ a {
 }
 
 .nav-list {
-    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    padding: 100px 24px 24px;
+    margin: 0;
+    background: rgba(10, 8, 12, 0.96);
+    backdrop-filter: blur(16px);
     list-style: none;
-    gap: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transform: translateX(100%);
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.nav-list.active {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nav-list li {
+    width: 100%;
 }
 
 .nav-list a {
+    display: block;
+    width: 100%;
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-text-light);
     transition: var(--transition);
     position: relative;
+    padding: 12px 0;
 }
 
 .nav-list a:hover,
@@ -210,20 +248,95 @@ a {
 }
 
 .hamburger {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 5px;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
+    z-index: 11;
 }
 
 .hamburger span {
-    width: 25px;
+    width: 26px;
     height: 2px;
     background-color: var(--color-text-light);
     transition: var(--transition);
+}
+
+.header.scrolled {
+    background: linear-gradient(180deg, rgba(74, 15, 27, 0.98), rgba(40, 10, 15, 0.95));
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.back-to-top {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--color-accent-gold);
+    color: var(--color-bg-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.8;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+    opacity: 1;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(100%, 360px);
+    padding: 0 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: rgba(10, 8, 12, 0.96);
+    color: var(--color-text-light);
+    padding: 16px 20px;
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(201, 168, 106, 0.15);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    pointer-events: auto;
+}
+
+.toast.success {
+    border-color: rgba(37, 211, 102, 0.2);
+}
+
+.toast.error {
+    border-color: rgba(244, 67, 54, 0.2);
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
 }
 
 /* Hero Section */
@@ -236,6 +349,8 @@ a {
     justify-content: center;
     margin-top: 0;
     background: linear-gradient(135deg, var(--color-bg-primary), var(--color-accent-maroon));
+    content-visibility: auto;
+    contain-intrinsic-size: 100dvh;
 }
 
 .hero::before {
@@ -275,6 +390,12 @@ a {
     font-family: var(--font-heading);
     opacity: 0;
     animation: fadeInUp 1s ease 0.5s forwards;
+}
+
+.hero-title span {
+    display: inline-block;
+    opacity: 0;
+    animation: fadeInUp 0.55s ease forwards;
 }
 
 .hero-subtitle {
@@ -404,6 +525,8 @@ a {
     object-fit: contain;
     background: transparent;
     transition: var(--transition);
+    content-visibility: auto;
+    contain-intrinsic-size: 400px 300px;
 }
 
 .section-title {
@@ -1082,7 +1205,23 @@ a {
     gap: 30px;
 }
 
-/* Product Card */
+/* CSS Containment for Performance */
+section {
+    content-visibility: auto;
+    contain-intrinsic-size: 800px;
+}
+
+.product-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
+    contain: layout style paint;
+}
+
+.product-image {
+    content-visibility: auto;
+    contain-intrinsic-size: 350px 280px;
+}
+
 .product-card {
     position: relative;
     background-color: var(--color-bg-accent);
@@ -1090,6 +1229,9 @@ a {
     overflow: hidden;
     transition: var(--transition);
     border: 1px solid rgba(0, 0, 0, 0.1);
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
+    contain: layout style paint;
 }
 
 @media (min-width: 768px) {
@@ -1100,6 +1242,59 @@ a {
     
     .collections-grid {
         grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .nav-list {
+        position: static;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        backdrop-filter: none;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 40px;
+    }
+
+    .nav-list a {
+        padding: 0;
+    }
+
+    .hamburger {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    }
+
+    .section-title,
+    .brand-statement h2,
+    .cta-banner h2 {
+        font-size: clamp(2rem, 3vw, 2.3rem);
+    }
+
+    .lookbook-grid,
+    .why-us-grid,
+    .collections-grid {
+        gap: 24px;
+    }
+
+    .footer-content {
+        gap: 28px;
     }
 }
 
@@ -1949,22 +2144,27 @@ small {
     
     .nav-list {
         position: fixed;
-        top: 70px;
-        right: -100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 320px;
+        padding: 100px 24px 24px;
         flex-direction: column;
         background: linear-gradient(180deg, rgba(74, 15, 27, 0.98), rgba(40, 10, 15, 0.99));
         backdrop-filter: blur(12px);
-        width: 100%;
-        text-align: center;
-        transition: 0.3s;
-        padding: 20px 0;
+        width: min(320px, 85vw);
+        text-align: left;
+        transition: transform 0.3s ease, opacity 0.3s ease;
         gap: 20px;
-        border-bottom: 1px solid rgba(201, 168, 106, 0.15);
+        border-left: 1px solid rgba(201, 168, 106, 0.15);
         z-index: 10000;
     }
     
     .nav-list.active {
-        right: 0;
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
     }
     
     /* Admin Panel Mobile Fixes */
@@ -2123,6 +2323,47 @@ small {
     }
 }
 
+@media (max-width: 480px) {
+    .collections-grid,
+    .lookbook-grid,
+    .why-us-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .hero-title {
+        font-size: 1.6rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .brand-statement h2 {
+        font-size: 1.2rem;
+    }
+    
+    .brand-statement p {
+        font-size: 0.8rem;
+    }
+    
+    .container {
+        width: 95%;
+        padding: 0 10px;
+    }
+    
+    .product-card {
+        margin: 0 auto;
+        max-width: 100%;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+}
+
 @media (max-width: 576px) {
     .collections-grid,
     .lookbook-grid,
@@ -2131,11 +2372,11 @@ small {
     }
     
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .hero-buttons {
@@ -2144,23 +2385,32 @@ small {
     }
     
     .brand-statement h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .brand-statement p {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .cta-banner h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .newsletter-section h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .section-title {
-        font-size: 2rem;
+        font-size: 1.6rem;
+    }
+    
+    .newsletter-form {
+        padding: 0 10px;
+    }
+    
+    .newsletter-form input,
+    .newsletter-form button {
+        width: 100%;
     }
 }
 
@@ -2170,7 +2420,7 @@ small {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 100px 0;
+    padding: 60px 0;
     background: linear-gradient(135deg, var(--color-bg-primary), var(--color-accent-maroon));
 }
 
@@ -2218,7 +2468,7 @@ small {
 .admin-panel {
     position: relative;
     z-index: 2;
-    padding: 100px 0 40px;
+    padding: 80px 0 40px;
     min-height: 100vh;
     background-color: var(--color-bg-primary);
 }

@@ -82,8 +82,9 @@ const navList = document.querySelector('.nav-list');
 if (hamburger && navList) {
     hamburger.addEventListener('click', (e) => {
         e.stopPropagation();
-        navList.classList.toggle('active');
+        const isOpen = navList.classList.toggle('active');
         hamburger.classList.toggle('active');
+        hamburger.setAttribute('aria-expanded', String(isOpen));
     });
 }
 
@@ -92,7 +93,10 @@ document.querySelectorAll('.nav-list a').forEach(link => {
     link.addEventListener('click', () => {
         if (navList && navList.classList.contains('active')) {
             navList.classList.remove('active');
-            if (hamburger) hamburger.classList.remove('active');
+            if (hamburger) {
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 });
@@ -100,8 +104,11 @@ document.querySelectorAll('.nav-list a').forEach(link => {
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
     if (hamburger && navList && !hamburger.contains(e.target) && !navList.contains(e.target)) {
-        navList.classList.remove('active');
-        hamburger.classList.remove('active');
+        if (navList.classList.contains('active')) {
+            navList.classList.remove('active');
+            hamburger.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
     }
 });
 
@@ -176,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     
     // Animate hero text character by character
-    const heroTitle = document.querySelector('.hero-text h1');
+    const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
         const text = heroTitle.textContent;
         heroTitle.innerHTML = '';

@@ -71,7 +71,7 @@ function renderProducts(productsToShow) {
         
         card.innerHTML = `
             <div class="product-image">
-                <img src="${imageUrl}" alt="${product.product_name}">
+                <img src="${imageUrl}" alt="${product.product_name}" loading="lazy">
             </div>
             <div class="product-info">
                 <h3 class="product-name">${product.product_name}</h3>

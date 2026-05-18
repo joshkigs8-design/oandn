@@ -15,14 +15,14 @@
         <div class="container">
             <div class="logo"><a href="index.html">O & N FITS</a></div>
             <nav>
-                <ul class="nav-list">
+                <ul id="primaryNav" class="nav-list">
                     <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
                     <li><a href="about.html">About</a></li>
                     <li><a href="contact.html">Contact</a></li>
                 </ul>
             </nav>
-            <button class="hamburger">
+            <button class="hamburger" aria-controls="primaryNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -160,10 +160,10 @@
      try {
          const lookbook = await adminAPI.getLookbook();
          lookbook.forEach(item => {
-             const div = document.createElement('div');
-             div.className = 'lookbook-item';
-             div.innerHTML = `<img src="${item.imageUrl}" alt="${item.alt || 'Lookbook item'}">`;
-             grid.appendChild(div);
+const div = document.createElement('div');
+              div.className = 'lookbook-item';
+              div.innerHTML = `<img src="${item.imageUrl}" alt="${item.alt || 'Lookbook item'}" loading="lazy">`;
+              grid.appendChild(div);
          });
      } catch (e) {
          console.log('Could not load lookbook images');
