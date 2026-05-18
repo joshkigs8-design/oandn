@@ -18,8 +18,10 @@ window.addEventListener('load', () => {
     }
 });
 
-// Animated particles background
+// Animated particles background (disabled on mobile for performance)
 function createParticles() {
+    if (window.innerWidth <= 768) return; // Disable on mobile
+    
     const container = document.createElement('div');
     container.className = 'particles-container';
     container.style.position = 'fixed';
@@ -110,11 +112,12 @@ window.addEventListener('scroll', () => {
     lastScroll = currentScroll;
 });
 
-// Scroll-triggered animations
+// Scroll-triggered animations (disabled on mobile for performance)
 function initScrollAnimations() {
     if (typeof ScrollTrigger === 'undefined' || !ScrollTrigger) {
         return;
     }
+    if (window.innerWidth <= 768) return; // Disable on mobile
     
     gsap.utils.toArray('.product-card, .stat-card, .review-item').forEach(el => {
         gsap.from(el, {

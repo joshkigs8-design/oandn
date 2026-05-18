@@ -33,6 +33,7 @@ body {
     z-index: 0;
 }
 
+/* Animated gradient overlay */
 body::before {
     content: '';
     position: fixed;
@@ -45,6 +46,13 @@ body::before {
     pointer-events: none;
     z-index: 1;
     animation: gradientShift 20s ease infinite;
+    will-change: transform;
+}
+
+@supports (-webkit-touch-callout: none) {
+    body::before {
+        animation: none;
+    }
 }
 
 main {
@@ -2100,10 +2108,6 @@ small {
     .lookbook-grid,
     .why-us-grid {
         grid-template-columns: 1fr;
-    }
-    
-    body::before {
-        animation: none;
     }
     
     .hero-title {
