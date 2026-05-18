@@ -85,6 +85,7 @@ if (hamburger && navList) {
         const isOpen = navList.classList.toggle('active');
         hamburger.classList.toggle('active');
         hamburger.setAttribute('aria-expanded', String(isOpen));
+        document.body.classList.toggle('menu-open', isOpen);
     });
 }
 
@@ -93,6 +94,7 @@ document.querySelectorAll('.nav-list a').forEach(link => {
     link.addEventListener('click', () => {
         if (navList && navList.classList.contains('active')) {
             navList.classList.remove('active');
+            document.body.classList.remove('menu-open');
             if (hamburger) {
                 hamburger.classList.remove('active');
                 hamburger.setAttribute('aria-expanded', 'false');
@@ -106,6 +108,7 @@ document.addEventListener('click', (e) => {
     if (hamburger && navList && !hamburger.contains(e.target) && !navList.contains(e.target)) {
         if (navList.classList.contains('active')) {
             navList.classList.remove('active');
+            document.body.classList.remove('menu-open');
             hamburger.classList.remove('active');
             hamburger.setAttribute('aria-expanded', 'false');
         }
