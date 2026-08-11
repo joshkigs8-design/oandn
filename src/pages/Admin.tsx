@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminDashboard from '@/components/admin/AdminDashboard'
@@ -13,8 +14,14 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user } = useAuth()
+  const navigate = useNavigate()
 
-  if (user?.role !== 'admin') {
+  if (!user) {
+    navigate('/admin/login', { replace: true })
+    return null
+  }
+
+  if (user.role !== 'admin') {
     return (
       <div className="min-h-screen bg-ivory-50 flex items-center justify-center">
         <div className="bg-white rounded-lg border border-ivory-200 p-8 text-center max-w-md">

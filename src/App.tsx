@@ -11,6 +11,7 @@ import Cart from '@/pages/Cart'
 import Checkout from '@/pages/Checkout'
 import Account from '@/pages/Account'
 import Admin from '@/pages/Admin'
+import AdminLogin from '@/pages/AdminLogin'
 import CartDrawer from '@/components/cart/CartDrawer'
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
               </Routes>
             </main>
             <Footer />
