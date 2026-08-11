@@ -1,52 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, X } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 import type { Order } from '@/types'
-
-const mockOrders: Order[] = [
-  {
-    id: '1',
-    user_id: null,
-    status: 'Delivered',
-    payment_status: 'Paid',
-    payment_method: 'M-Pesa',
-    transaction_ref: 'REF001',
-    subtotal: 10000,
-    delivery_fee: 500,
-    total: 10500,
-    customer_name: 'Jane Mwangi',
-    customer_email: 'jane@example.com',
-    customer_phone: '+254 712 345678',
-    delivery_county: 'Nairobi',
-    delivery_town: 'Westlands',
-    delivery_address: '123 Parklands Ave',
-    delivery_instructions: null,
-    items: [],
-    created_at: '2026-08-10T10:00:00Z',
-    updated_at: '2026-08-10T10:00:00Z',
-  },
-  {
-    id: '2',
-    user_id: null,
-    status: 'Processing',
-    payment_status: 'Pending',
-    payment_method: 'M-Pesa',
-    transaction_ref: 'REF002',
-    subtotal: 8000,
-    delivery_fee: 500,
-    total: 8500,
-    customer_name: 'David Ochieng',
-    customer_email: 'david@example.com',
-    customer_phone: '+254 723 456789',
-    delivery_county: 'Kisumu',
-    delivery_town: 'Kisumu Central',
-    delivery_address: '45 Lake Road',
-    delivery_instructions: null,
-    items: [],
-    created_at: '2026-08-10T08:30:00Z',
-    updated_at: '2026-08-10T08:30:00Z',
-  },
-]
 
 const statuses = [
   'Order Placed',
@@ -60,23 +16,58 @@ const statuses = [
 ]
 
 export default function AdminOrders() {
-  const [orders, setOrders] = useState<Order[]>(mockOrders)
+  const [orders, setOrders] = useState<Order[]>([])
   const [filter, setFilter] = useState<string>('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!supabase) {
+        setIsLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        alert(error.message)
+      }
+
+      if (data) {
+        setOrders(data.map((order) => ({ ...order, items: [] })) as Order[])
+      }
+
+      setIsLoading(false)
+    }
+
+    loadOrders()
+  }, [])
 
   const filtered = useMemo(() => {
     if (filter === 'all') return orders
     return orders.filter((o) => o.status === filter || o.payment_status === filter)
   }, [orders, filter])
 
-  const updateStatus = (order: Order, field: 'status' | 'payment_status', value: string) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === order.id ? { ...o, [field]: value as Order['status'] } : o
-      )
-    )
+  const updateStatus = async (order: Order, field: 'status' | 'payment_status', value: string) => {
+    if (!supabase) return
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ [field]: value })
+      .eq('id', order.id)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    setOrders((prev) => prev.map((o) => (o.id === order.id ? { ...o, [field]: value } : o)))
     if (selectedOrder?.id === order.id) {
-      setSelectedOrder({ ...order, [field]: value as Order['status'] })
+      setSelectedOrder({ ...selectedOrder, [field]: value } as Order)
     }
   }
 
@@ -101,12 +92,20 @@ export default function AdminOrders() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-gold-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-serif text-charcoal">Orders</h1>
 
       <div className="bg-white rounded-lg border border-ivory-200">
-        <div className="p-4 border-b border-ivory-200 flex items-center gap-3">
+        <div className="p-4 border-b border-ivory-200 flex flex-col gap-3 sm:flex-row sm:items-center">
           <label className="text-sm font-medium text-charcoal-light">Filter:</label>
           <select
             value={filter}
@@ -142,7 +141,7 @@ export default function AdminOrders() {
                   <td className="px-4 py-3 text-charcoal font-medium">ORD-{order.id}</td>
                   <td className="px-4 py-3 text-charcoal">{order.customer_name}</td>
                   <td className="px-4 py-3 text-charcoal">{order.customer_phone}</td>
-                  <td className="px-4 py-3 text-charcoal">KES {order.total.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-charcoal">KES {Number(order.total).toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor(order.payment_status)}`}>
                       {order.payment_status}
@@ -196,9 +195,7 @@ export default function AdminOrders() {
               className="relative bg-white rounded-lg border border-ivory-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between p-5 border-b border-ivory-200">
-                <h3 className="text-lg font-serif text-charcoal">
-                  Order ORD-{selectedOrder.id}
-                </h3>
+                <h3 className="text-lg font-serif text-charcoal">Order ORD-{selectedOrder.id}</h3>
                 <button onClick={() => setSelectedOrder(null)} className="p-1 rounded hover:bg-ivory-100">
                   <X className="w-5 h-5 text-charcoal-light" />
                 </button>
@@ -230,16 +227,14 @@ export default function AdminOrders() {
                 <div>
                   <h4 className="text-xs font-medium text-charcoal-light uppercase tracking-wider mb-2">Order Summary</h4>
                   <div className="bg-ivory-50 rounded-md p-4 text-sm text-charcoal space-y-1">
-                    <p>Subtotal: KES {selectedOrder.subtotal.toLocaleString()}</p>
-                    <p>Delivery Fee: KES {selectedOrder.delivery_fee.toLocaleString()}</p>
-                    <p className="font-semibold text-charcoal">Total: KES {selectedOrder.total.toLocaleString()}</p>
+                    <p>Subtotal: KES {Number(selectedOrder.subtotal).toLocaleString()}</p>
+                    <p>Delivery Fee: KES {Number(selectedOrder.delivery_fee).toLocaleString()}</p>
+                    <p className="font-semibold text-charcoal">Total: KES {Number(selectedOrder.total).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
               <div className="flex justify-end p-5 border-t border-ivory-200">
-                <button onClick={() => setSelectedOrder(null)} className="btn-secondary">
-                  Close
-                </button>
+                <button onClick={() => setSelectedOrder(null)} className="btn-secondary">Close</button>
               </div>
             </motion.div>
           </motion.div>

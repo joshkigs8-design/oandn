@@ -3,6 +3,7 @@ export interface Category {
   name: string
   slug: string
   image_url: string | null
+  storage_path?: string | null
   description: string | null
   sort_order: number
   created_at: string
@@ -13,6 +14,7 @@ export interface ProductImage {
   product_id: string
   image_url: string
   alt_text: string | null
+  storage_path?: string | null
   sort_order: number
 }
 

@@ -46,7 +46,12 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-ivory-50">
-      <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <AdminSidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <div className="lg:pl-64">
         <div className="lg:hidden flex items-center gap-3 p-4 bg-ivory-100 border-b border-ivory-200 sticky top-0 z-20">

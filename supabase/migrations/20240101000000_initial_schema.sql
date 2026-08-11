@@ -21,6 +21,7 @@ create table public.categories (
   name text not null,
   slug text unique not null,
   image_url text,
+  storage_path text,
   description text,
   sort_order integer default 0,
   created_at timestamptz default now()
@@ -49,6 +50,7 @@ create table public.product_images (
   product_id uuid references public.products(id) on delete cascade not null,
   image_url text not null,
   alt_text text,
+  storage_path text,
   sort_order integer default 0
 );
 
@@ -265,10 +267,15 @@ create trigger orders_updated_at
 -- =============================================
 
 insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true);
+insert into storage.buckets (id, name, public) values ('category-images', 'category-images', true);
 
 create policy "Product images are publicly accessible"
   on storage.objects for select
   using (bucket_id = 'product-images');
+
+create policy "Category images are publicly accessible"
+  on storage.objects for select
+  using (bucket_id = 'category-images');
 
 create policy "Admins can upload product images"
   on storage.objects for insert
@@ -284,9 +291,30 @@ create policy "Admins can update product images"
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
 
+create policy "Admins can upload category images"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'category-images' and
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+create policy "Admins can update category images"
+  on storage.objects for update
+  using (
+    bucket_id = 'category-images' and
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
 create policy "Admins can delete product images"
   on storage.objects for delete
   using (
     bucket_id = 'product-images' and
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
+create policy "Admins can delete category images"
+  on storage.objects for delete
+  using (
+    bucket_id = 'category-images' and
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
