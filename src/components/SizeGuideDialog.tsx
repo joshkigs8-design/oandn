@@ -197,7 +197,9 @@ export function SizeGuideDialog({
             <div className="text-xs space-y-1">
               <p className="font-semibold text-foreground">O&amp;N Proportions Guidance:</p>
               <p className="text-muted-foreground leading-relaxed">
-                All O&amp;N Fleece and Tops are pre-shrunk with a tailored drop shoulder. If you prefer a contemporary boxy streetwear silhouette, order your standard size. For a fitted look, choose one size down.
+                All O&amp;N Fleece and Tops are pre-shrunk with a tailored drop shoulder. If you
+                prefer a contemporary boxy streetwear silhouette, order your standard size. For a
+                fitted look, choose one size down.
               </p>
             </div>
           </div>
@@ -206,7 +208,8 @@ export function SizeGuideDialog({
         {/* Footer */}
         <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <Check className="size-3.5 text-gold" /> Free 14-Day Doorstep Size Exchanges Across Kenya
+            <Check className="size-3.5 text-gold" /> Free 14-Day Doorstep Size Exchanges Across
+            Kenya
           </span>
           <button
             type="button"
@@ -220,4 +223,3 @@ export function SizeGuideDialog({
     </div>
   );
 }
-

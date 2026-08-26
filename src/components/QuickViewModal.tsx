@@ -67,11 +67,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
         <div className="grid sm:grid-cols-2">
           {/* Left: Product Image */}
           <div className="relative aspect-[4/5] bg-secondary sm:h-full overflow-hidden">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
+            <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
             {product.isNew ? (
               <span className="absolute top-3 left-3 bg-gold px-2.5 py-1 text-[0.55rem] tracking-widest text-primary-foreground uppercase font-bold">
                 New Season
@@ -194,10 +190,7 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
                   title="Wishlist"
                 >
                   <Heart
-                    className={cn(
-                      "size-4",
-                      wishlisted ? "fill-gold text-gold" : "text-foreground",
-                    )}
+                    className={cn("size-4", wishlisted ? "fill-gold text-gold" : "text-foreground")}
                   />
                 </button>
               </div>
@@ -219,4 +212,3 @@ export function QuickViewModal({ product, open, onOpenChange }: QuickViewModalPr
     </div>
   );
 }
-
