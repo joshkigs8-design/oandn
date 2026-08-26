@@ -18,7 +18,7 @@ const placeOrderSchema = checkoutSchema.extend({
 
 export const placeOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(placeOrderSchema)
+  .validator((input: unknown) => placeOrderSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -109,7 +109,7 @@ export const placeOrder = createServerFn({ method: "POST" })
 
 export const getOrderPaymentStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(z.object({ orderId: z.string().uuid() }))
+  .validator((input: unknown) => z.object({ orderId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     // RLS scopes this to the caller's own orders (or an admin).
     const { data: row } = await context.supabase
