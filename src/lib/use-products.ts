@@ -35,13 +35,42 @@ export const rowToProduct = (row: ProductRow): Product => ({
   inStock: row.in_stock,
 });
 
+const LEGACY_DUMMY_SLUGS = new Set([
+  "on-classic-hoodie",
+  "on-overshirt",
+  "on-minimal-tee",
+  "on-signature-cap",
+  "on-signature-beanie",
+  "on-essential-hoodie",
+  "on-relaxed-trousers",
+  "on-boxy-tee-white",
+]);
+
 export async function fetchProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("sort_order", { ascending: true });
-  if (error) throw error;
-  return (data as unknown as ProductRow[]).map(rowToProduct);
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (error || !data) return fallback;
+
+    // Filter out old AI dummy seed records that have legacy slugs or placeholder asset paths
+    const realDbRows = (data as unknown as ProductRow[]).filter(
+      (r) => !LEGACY_DUMMY_SLUGS.has(r.slug) && !r.image.startsWith("/assets/"),
+    );
+
+    // If the database has only the legacy dummy records, use the master real catalog
+    if (realDbRows.length === 0) {
+      return fallback;
+    }
+
+    // Merge: master real catalog + any newly added custom products from Supabase
+    const mappedDb = realDbRows.map(rowToProduct);
+    const dbSlugs = new Set(mappedDb.map((p) => p.slug));
+    return [...fallback.filter((p) => !dbSlugs.has(p.slug)), ...mappedDb];
+  } catch {
+    return fallback;
+  }
 }
 
 export function useProducts() {

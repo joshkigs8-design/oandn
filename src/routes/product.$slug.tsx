@@ -430,7 +430,7 @@ function ProductPage() {
             <Button
               variant="ink"
               size="luxlg"
-              asChild={product.inStock}
+              asChild={Boolean(product.inStock)}
               disabled={!product.inStock}
             >
               {product.inStock ? (

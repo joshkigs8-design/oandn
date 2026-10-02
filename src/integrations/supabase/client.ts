@@ -36,12 +36,12 @@ function createSupabaseClient() {
     import.meta.env["VITE_SUPABASE_URL"] ||
     process.env["SUPABASE_URL"] ||
     process.env["VITE_SUPABASE_URL"] ||
-    "https://smnunzuwexyvkhfjjtff.supabase.co";
+    "https://fmjxagkltxekuovwhbnp.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY =
     import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
     process.env["SUPABASE_PUBLISHABLE_KEY"] ||
     process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
-    "sb_publishable_duYdXr8Wbhl8qRK83irVaw_NaSYN1Wy";
+    "sb_publishable_WaDShA2vmS5dMN5xVtE7Jw_uIU_e9rp";
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {

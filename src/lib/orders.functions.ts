@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { checkoutSchema, DELIVERY_FLAT, FREE_DELIVERY_THRESHOLD } from "@/lib/checkout";
+import { products as fallback } from "@/lib/catalog";
 import { z } from "zod";
 
 const lineSchema = z.object({
@@ -22,18 +23,39 @@ export const placeOrder = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Prices always come from the database, never from the browser.
-    const { data: rows, error: productError } = await supabaseAdmin
-      .from("products")
-      .select("id, name, price, image, in_stock")
-      .in(
-        "id",
-        data.items.map((i) => i.productId),
-      );
-    if (productError) throw new Error(productError.message);
+    // Prices always come from the database or verified master catalog, never from untrusted browser input.
+    const validUuids = data.items
+      .map((i) => i.productId)
+      .filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+
+    let dbRows: Array<{ id: string; name: string; price: number; image: string; in_stock: boolean }> = [];
+    if (validUuids.length > 0) {
+      const { data: rows, error: productError } = await supabaseAdmin
+        .from("products")
+        .select("id, name, price, image, in_stock")
+        .in("id", validUuids);
+      if (productError) throw new Error(productError.message);
+      if (rows) dbRows = rows;
+    }
 
     const items = data.items.map((line) => {
-      const row = rows?.find((r) => r.id === line.productId);
+      // 1. Try finding in database by id
+      let row = dbRows.find((r) => r.id === line.productId);
+
+      // 2. If not found by uuid, resolve from verified master catalog
+      if (!row) {
+        const catalogItem = fallback.find((p) => p.id === line.productId || p.slug === line.slug);
+        if (catalogItem) {
+          row = {
+            id: catalogItem.id,
+            name: catalogItem.name,
+            price: catalogItem.price,
+            image: catalogItem.image,
+            in_stock: Boolean(catalogItem.inStock),
+          };
+        }
+      }
+
       if (!row) throw new Error(`Product no longer available: ${line.name}`);
       if (!row.in_stock) throw new Error(`${row.name} is sold out`);
       return { ...line, name: row.name, image: row.image, price: row.price };
@@ -42,6 +64,13 @@ export const placeOrder = createServerFn({ method: "POST" })
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FLAT;
     const total = subtotal + deliveryFee;
+
+    const receiptNumber = data.mpesaReceiptNumber?.trim() || null;
+    const paymentStatus = receiptNumber
+      ? "paid"
+      : data.paymentMethod === "cod"
+        ? "on_delivery"
+        : "pending";
 
     const { data: order, error } = await supabaseAdmin
       .from("orders")
@@ -60,51 +89,21 @@ export const placeOrder = createServerFn({ method: "POST" })
         total,
         payment_method: data.paymentMethod,
         status: "pending",
-        payment_status: data.paymentMethod === "cod" ? "on_delivery" : "pending",
+        payment_status: paymentStatus,
+        mpesa_receipt_number: receiptNumber,
       })
       .select("id")
       .single();
     if (error || !order) throw new Error(error?.message ?? "Could not create the order");
 
-    if (data.paymentMethod === "cod") {
-      return { orderId: order.id, total, mpesa: "not_required" as const };
-    }
-
-    const { readMpesaConfig, stkPush } = await import("@/lib/mpesa.server");
-    const cfg = readMpesaConfig();
-    if (!cfg) {
-      await supabaseAdmin
-        .from("orders")
-        .update({ payment_status: "awaiting_setup" })
-        .eq("id", order.id);
-      return { orderId: order.id, total, mpesa: "not_configured" as const };
-    }
-
-    try {
-      const push = await stkPush({
-        cfg,
-        phone: data.phone,
-        amount: total,
-        reference: `ON-${order.id.slice(0, 8)}`,
-        description: "O&N order",
-      });
-      await supabaseAdmin
-        .from("orders")
-        .update({
-          mpesa_checkout_request_id: push.checkoutRequestId,
-          mpesa_merchant_request_id: push.merchantRequestId,
-          payment_status: "stk_sent",
-        })
-        .eq("id", order.id);
-      return { orderId: order.id, total, mpesa: "prompt_sent" as const };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "STK push failed";
-      await supabaseAdmin
-        .from("orders")
-        .update({ payment_status: "failed", mpesa_result_desc: message })
-        .eq("id", order.id);
-      return { orderId: order.id, total, mpesa: "failed" as const, message };
-    }
+    return {
+      orderId: order.id,
+      total,
+      mpesa: "manual_till" as const,
+      paymentStatus,
+      receiptNumber,
+      message: "Order placed successfully! The owner will call you to confirm dispatch, or you can pay via Till 1673504.",
+    };
   });
 
 export const getOrderPaymentStatus = createServerFn({ method: "POST" })

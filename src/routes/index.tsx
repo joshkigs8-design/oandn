@@ -28,21 +28,19 @@ import { EMAIL, PHONE, WHATSAPP_URL } from "@/components/Footer";
 import { useProducts } from "@/lib/use-products";
 import { useCategories } from "@/lib/use-categories";
 import { cn } from "@/lib/utils";
-import editorialModel from "@/assets/editorial-model.jpg";
-import promoBanner from "@/assets/promo-banner.jpg";
 
 const DESCRIPTION =
-  "Discover O&N — premium luxury modern clothing handcrafted for timeless style and everyday confidence in Nairobi, Kenya.";
+  "Discover O&N FITS — premium luxury streetwear handcrafted with precision in Nairobi, Kenya. Explore authentic hoodies, sweatpants, co-ord sets, and crop tops.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "O&N — Timeless Luxury Streetwear. Made in Kenya." },
+      { title: "O&N FITS — Timeless Luxury Streetwear. Made in Kenya." },
       { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: "O&N — Timeless Luxury Streetwear. Made in Kenya." },
+      { property: "og:title", content: "O&N FITS — Timeless Luxury Streetwear. Made in Kenya." },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:url", content: "/" },
-      { property: "og:image", content: "/assets/editorial-model.jpg" },
+      { property: "og:image", content: "/images/catalog/on-real-01.jpeg" },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
@@ -52,33 +50,43 @@ export const Route = createFileRoute("/")({
 const HERO_SLIDES = [
   {
     id: 1,
-    title: "Signature Cream Hoodie",
-    subtitle: "420 GSM Brushed Loopback Fleece",
-    badge: "Editorial Capsule",
+    title: "Plain Heavyweight Hoodie",
+    subtitle: "420 GSM Brushed Loopback Fleece in Camel Beige",
+    badge: "Official Capsule",
     price: "KES 3,000",
-    image: editorialModel,
-    link: "/product/on-classic-hoodie",
-    btnText: "Shop Signature Piece",
+    image: "/images/catalog/on-real-45.jpeg",
+    link: "/product/on-plain-hoodie-beige",
+    btnText: "Shop Plain Hoodie",
   },
   {
     id: 2,
-    title: "Heavyweight Fleece Drops",
-    subtitle: "Pre-shrunk Double Stitch Tailoring",
+    title: "Royal Blue Co-ord Drop",
+    subtitle: "Heavyweight Matching Hoodie & Sweatpants Set",
     badge: "New Arrival",
-    price: "KES 3,000",
-    image: "/assets/cat-hoodies.jpg",
-    link: "/shop?category=hoodies",
-    btnText: "Explore Hoodies",
+    price: "KES 6,000",
+    image: "/images/catalog/on-real-11.jpeg",
+    link: "/product/on-plain-two-piece-set",
+    btnText: "Explore Co-ord Sets",
   },
   {
     id: 3,
-    title: "Structured Utility Overshirt",
-    subtitle: "Washed Cotton Twill Layer in Camel",
-    badge: "Outerwear Essential",
-    price: "KES 4,000",
-    image: "/assets/cat-outerwear.jpg",
-    link: "/product/on-overshirt",
-    btnText: "Shop Overshirt",
+    title: "Designed Buttoned Tearaway Pants",
+    subtitle: "Functional Snap Button Seams in Golden Yellow",
+    badge: "Streetwear Essential",
+    price: "KES 3,500",
+    image: "/images/catalog/on-real-37.jpeg",
+    link: "/product/on-designed-buttoned-pants",
+    btnText: "Shop Buttoned Pants",
+  },
+  {
+    id: 4,
+    title: "Forest Green Cropped Zip Jacket",
+    subtitle: "Tailored High-Collar Zip-Up Fleece with Cinch Waist",
+    badge: "Editorial Spotlight",
+    price: "KES 3,000",
+    image: "/images/catalog/on-real-05.jpeg",
+    link: "/product/on-designed-cropped-zip-jacket",
+    btnText: "Shop Cropped Jacket",
   },
 ];
 
@@ -86,7 +94,7 @@ const TRUST_PILLARS = [
   {
     Icon: Truck,
     title: "Nationwide Dispatch",
-    copy: "Same-day Nairobi delivery · 1–2 days across all 47 counties.",
+    copy: "Same-day Eldoret dispatch · Fast courier delivery across all 47 counties.",
   },
   {
     Icon: ShieldCheck,
@@ -95,8 +103,8 @@ const TRUST_PILLARS = [
   },
   {
     Icon: Lock,
-    title: "Daraja M-Pesa & COD",
-    copy: "Instant STK push or pay rider upon physical delivery.",
+    title: "Lipa Na M-PESA Till 1673504",
+    copy: "Seamless Buy Goods payment or confirm with owner before dispatch.",
   },
   {
     Icon: RotateCcw,
@@ -110,52 +118,64 @@ const TESTIMONIALS = [
     name: "Brian Kiprop",
     location: "Kilimani, Nairobi",
     quote:
-      "The 420 GSM weight on the Classic Hoodie is phenomenal. Easily contends with international luxury streetwear brands, and delivery was under 3 hours in Nairobi.",
+      "The 420 GSM weight on the Plain Hoodie is phenomenal. Contends directly with international luxury streetwear brands, and delivery was under 3 hours in Nairobi.",
     rating: 5,
-    piece: "O&N Classic Hoodie (Cream)",
+    piece: "O&N Plain Heavyweight Hoodie (Beige)",
   },
   {
     name: "Vanessa Wanjiku",
     location: "Nyali, Mombasa",
     quote:
-      "Ordered the Overshirt and Minimal Tee on Tuesday, received them in Nyali on Wednesday afternoon. The tailored fit and tonal gold embroidery are pristine.",
+      "Ordered the Forest Green Zip Jacket and shorts set on Tuesday, received them in Nyali on Wednesday afternoon. The tailored fit and tonal embroidery are pristine.",
     rating: 5,
-    piece: "O&N Overshirt (Camel)",
+    piece: "O&N Designed Cropped Zip Sweatshirt",
   },
   {
     name: "Kevin Omondi",
     location: "Milimani, Kisumu",
     quote:
-      "M-Pesa STK checkout was seamless and the fabric thickness doesn’t lose shape after repeated washing. O&N is setting the standard for Kenyan apparel.",
+      "M-Pesa STK checkout was seamless and the fabric thickness doesn't lose shape after repeated washing. O&N FITS is setting the standard for Kenyan streetwear.",
     rating: 5,
-    piece: "O&N Minimal Tee (Charcoal)",
+    piece: "O&N Designed Buttoned Tearaway Pants",
   },
 ];
 
 const LOOKBOOK_PIECES = [
   {
     tag: "@alex_maina",
-    image: "/assets/cat-hoodies.jpg",
-    caption: "Layered Cream Hoodie with utility cargo",
-    category: "Hoodies",
+    image: "/images/catalog/on-real-22.jpeg",
+    caption: "Forest Green wide leg trousers & white crewneck",
+    category: "Pants",
   },
   {
     tag: "@samuel.k",
-    image: "/assets/cat-outerwear.jpg",
-    caption: "Structured Camel Overshirt in Westlands",
-    category: "Outerwear",
+    image: "/images/catalog/on-real-14.jpeg",
+    caption: "Wavy two-tone split sweatshirt & lilac pants",
+    category: "Sweatshirts",
   },
   {
     tag: "@chloe_n",
-    image: "/assets/cat-tshirts.jpg",
-    caption: "Oversized Minimal Tee styled relaxed",
-    category: "T-Shirts",
+    image: "/images/catalog/on-real-33.jpeg",
+    caption: "Safety orange cargo utility set in the atrium",
+    category: "Sets",
   },
   {
-    tag: "/assets/cat-accessories.jpg",
-    image: "/assets/cat-accessories.jpg",
-    caption: "Embroidered Gold Emblem Cap",
-    category: "Caps",
+    tag: "@nairobi_street",
+    image: "/images/catalog/on-real-13.jpeg",
+    caption: "Plush textured overcoat & ribbed fold-over beanie",
+    category: "Outerwear",
+  },
+  {
+    tag: "@fashion_ke",
+    image: "/images/catalog/on-real-38.jpeg",
+    caption: "Handcrafted yellow & black applique tracksuit",
+    category: "Sets",
+  },
+  {
+    tag: "@lifestyle_nbo",
+    image: "/images/catalog/on-real-48.jpeg",
+    caption: "Cropped zip jacket & flared contrast sweatpants",
+    category: "Sweatshirts",
   },
 ];
 
@@ -190,11 +210,11 @@ function Index() {
       if (activeCuratorTab === "all") return true;
       return p.category.toLowerCase() === activeCuratorTab.toLowerCase();
     })
-    .slice(0, 6);
+    .slice(0, 12);
 
   return (
     <>
-      {/* 1. HERO SECTION WITH 3-SLIDE CAROUSEL */}
+      {/* 1. HERO SECTION WITH 4-SLIDE REAL PHOTOGRAPHY CAROUSEL */}
       <section className="relative overflow-hidden bg-[image:var(--gradient-ivory)]">
         <GoldFlow className="opacity-60" />
         <Watermark className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[38vw] text-gold/[0.045] lg:text-[25vw] select-none pointer-events-none" />
@@ -205,21 +225,21 @@ function Index() {
             <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-card/80 px-3.5 py-1.5 backdrop-blur-sm shadow-sm">
               <span className="size-2 rounded-full bg-gold animate-pulse" />
               <span className="text-[0.68rem] font-semibold tracking-wider text-foreground uppercase">
-                New Season Release · Nairobi Atelier
+                Official Campaign · Nairobi Atelier
               </span>
             </div>
 
             <h1 className="mt-6 font-serif text-[3.25rem] leading-[0.93] tracking-tight text-foreground sm:text-7xl lg:text-[5.5rem]">
-              Timeless Style.
+              Style That Speaks
               <br />
-              Made for <span className="text-gradient-gold italic">You.</span>
+              <span className="text-gradient-gold italic">for Itself.</span>
             </h1>
 
             <span className="mt-7 block h-px w-24 bg-[image:var(--gradient-gold)]" />
 
             <p className="mt-6 max-w-lg text-base sm:text-lg leading-relaxed text-muted-foreground">
-              Heavyweight essentials engineered from 420 GSM combed loopback fleece, tailored
-              proportions, and refined tonal gold detailing.
+              Timeless streetwear crafted with uncompromising quality. Heavyweight silhouettes,
+              sculpted proportions, and effortless luxury made for Kenya and beyond.
             </p>
 
             {/* Quick Action Buttons */}
@@ -240,9 +260,10 @@ function Index() {
               <div className="mt-3 flex flex-wrap gap-2">
                 {[
                   { name: "Hoodies", slug: "hoodies" },
-                  { name: "T-Shirts", slug: "t-shirts" },
-                  { name: "Outerwear", slug: "outerwear" },
-                  { name: "Caps & Beanies", slug: "accessories" },
+                  { name: "Pants", slug: "bottoms" },
+                  { name: "Co-ord Sets", slug: "sets" },
+                  { name: "Sweatshirts", slug: "sweatshirts" },
+                  { name: "Crop Tops", slug: "ladies" },
                 ].map((item) => (
                   <Link
                     key={item.slug}
@@ -257,7 +278,7 @@ function Index() {
             </div>
           </div>
 
-          {/* Right Column: Interactive 3-Slide Hero Carousel */}
+          {/* Right Column: Interactive Hero Carousel with Real Photos */}
           <div
             className="animate-rise relative [animation-delay:180ms] group"
             onMouseEnter={() => setIsHovered(true)}
@@ -320,7 +341,7 @@ function Index() {
                       <p className="truncate text-sm font-semibold text-foreground font-serif">
                         {currentSlide.title}
                       </p>
-                      <p className="text-[0.68rem] text-muted-foreground">
+                      <p className="text-[0.68rem] text-muted-foreground truncate">
                         {currentSlide.subtitle}
                       </p>
                       <p className="mt-1 text-xs font-bold text-gold-deep">{currentSlide.price}</p>
@@ -382,9 +403,9 @@ function Index() {
             <SectionHeading eyebrow="Curated Collections" title="Shop by Category" />
           </Reveal>
 
-          <ul className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+          <ul className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {categories.map((cat, i) => (
-              <Reveal as="li" key={cat.slug} delay={i * 70}>
+              <Reveal as="li" key={cat.slug} delay={i * 50}>
                 <Link
                   to="/shop"
                   search={{ category: cat.slug }}
@@ -416,8 +437,77 @@ function Index() {
         </div>
       </section>
 
-      {/* 4. CURATOR'S INTERACTIVE LOOKBOOK / TABBED CATALOG */}
-      <section className="bg-[image:var(--gradient-ivory)] py-20 lg:py-28 border-t border-border/70">
+      {/* 4. DUAL VISUAL BANNERS: SIGNATURE STREETWEAR CAPSULES */}
+      <section className="bg-[image:var(--gradient-ivory)] py-16 border-t border-border/70">
+        <div className="mx-auto max-w-[1400px] px-5 lg:px-10">
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Visual Card 1: Sets & Hoodies */}
+            <Reveal className="group relative overflow-hidden rounded-xs border border-border bg-card shadow-lg min-h-[440px] flex flex-col justify-end">
+              <img
+                src="/images/catalog/on-real-11.jpeg"
+                alt="Co-ord sets and hoodies featuring royal blue heavy fleece uniform"
+                loading="lazy"
+                width={1200}
+                height={1500}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/40 to-transparent" />
+              <div className="relative z-10 p-8 sm:p-10">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/20 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-wider text-gold border border-gold/40 backdrop-blur-md">
+                  Signature Capsule
+                </span>
+                <h3 className="mt-3 font-serif text-3xl sm:text-4xl text-white font-normal">
+                  Co-ord Sets &amp; Hoodies
+                </h3>
+                <p className="mt-2 text-xs sm:text-sm text-gray-200">
+                  Heavyweight Hoodies &bull; Relaxed Pants &bull; Graphic Sweatshirts &bull; Matching Sets
+                </p>
+                <div className="mt-6">
+                  <Button variant="gold" size="lux" asChild>
+                    <Link to="/shop" search={{ category: "sets" }}>
+                      Shop Sets &amp; Hoodies &rarr;
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Visual Card 2: Crop Tops & Contoured Fits */}
+            <Reveal delay={100} className="group relative overflow-hidden rounded-xs border border-border bg-card shadow-lg min-h-[440px] flex flex-col justify-end">
+              <img
+                src="/images/catalog/on-real-24.jpeg"
+                alt="Contoured fits featuring ribbed knit crop tops and tailored flared sweatpants"
+                loading="lazy"
+                width={1200}
+                height={1500}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/40 to-transparent" />
+              <div className="relative z-10 p-8 sm:p-10">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/20 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-wider text-gold border border-gold/40 backdrop-blur-md">
+                  Contoured Fits
+                </span>
+                <h3 className="mt-3 font-serif text-3xl sm:text-4xl text-white font-normal">
+                  Crop Tops &amp; Contoured Fits
+                </h3>
+                <p className="mt-2 text-xs sm:text-sm text-gray-200">
+                  Ribbed Crop Tops &bull; Flared Sweatpants &bull; Cropped Zip Jackets &bull; Knit Vests
+                </p>
+                <div className="mt-6">
+                  <Button variant="gold" size="lux" asChild>
+                    <Link to="/shop" search={{ category: "ladies" }}>
+                      Shop Crop Tops &rarr;
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. CURATOR'S INTERACTIVE LOOKBOOK / TABBED CATALOG */}
+      <section className="bg-background py-20 lg:py-28 border-t border-border/70">
         <div className="mx-auto max-w-[1400px] px-5 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -430,15 +520,17 @@ function Index() {
               {[
                 { label: "All Pieces", id: "all" },
                 { label: "Hoodies", id: "hoodies" },
-                { label: "T-Shirts", id: "t-shirts" },
-                { label: "Outerwear", id: "outerwear" },
+                { label: "Pants", id: "bottoms" },
+                { label: "Sweatshirts", id: "sweatshirts" },
+                { label: "Co-ord Sets", id: "sets" },
+                { label: "Crop Tops", id: "ladies" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveCuratorTab(tab.id)}
                   className={cn(
-                    "px-4 py-2 text-xs uppercase tracking-wider transition-all rounded-xs font-medium cursor-pointer",
+                    "px-4 py-2 text-xs uppercase tracking-wider transition-all rounded-xs font-medium cursor-pointer whitespace-nowrap",
                     activeCuratorTab === tab.id
                       ? "bg-gold text-primary-foreground font-semibold shadow-xs"
                       : "bg-card border border-border text-muted-foreground hover:text-foreground",
@@ -460,19 +552,19 @@ function Index() {
 
           <div className="mt-14 text-center">
             <Button variant="gold" size="luxlg" asChild>
-              <Link to="/shop">View Full Catalog &rarr;</Link>
+              <Link to="/shop">View Full Collection ({products.length} Pieces) &rarr;</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* 5. EDITORIAL SPLIT SHOWCASE */}
+      {/* 6. EDITORIAL SPLIT SHOWCASE WITH REAL PHOTOGRAPHY */}
       <section className="bg-background border-y border-border/70">
         <div className="grid lg:grid-cols-2">
           <div className="relative min-h-[420px] overflow-hidden lg:min-h-[700px] group">
             <img
-              src={editorialModel}
-              alt="Model wearing the O&N cream hoodie and cap"
+              src="/images/catalog/on-real-01.jpeg"
+              alt="O&N FITS editorial models on terrace wearing signature collection pieces"
               loading="lazy"
               width={1200}
               height={1504}
@@ -492,8 +584,8 @@ function Index() {
               </h2>
               <span className="mt-6 block h-px w-20 bg-gold" />
               <p className="mt-6 text-sm sm:text-base leading-relaxed text-muted-foreground">
-                Considered drop-shoulder proportions, pre-shrunk heavyweight fabrics and a versatile
-                earth-toned palette. Each O&amp;N piece is engineered to endure frequent rotation
+                Considered drop-shoulder proportions, pre-shrunk heavyweight fabrics and an authentic
+                earth-toned palette. Each O&amp;N FITS piece is engineered to endure frequent rotation
                 and feel softer with every wash.
               </p>
 
@@ -521,7 +613,7 @@ function Index() {
         </div>
       </section>
 
-      {/* 6. VERIFIED CLIENT TESTIMONIALS */}
+      {/* 7. VERIFIED CLIENT TESTIMONIALS */}
       <section className="bg-background py-20 lg:py-28">
         <div className="mx-auto max-w-[1400px] px-5 lg:px-10">
           <Reveal>
@@ -563,20 +655,20 @@ function Index() {
         </div>
       </section>
 
-      {/* 7. PROMOTIONAL VOUCHER BANNER */}
+      {/* 8. PROMOTIONAL VOUCHER BANNER WITH REAL PHOTO BACKGROUND */}
       <section className="relative overflow-hidden">
-        <div className="relative min-h-[440px]">
+        <div className="relative min-h-[460px]">
           <img
-            src={promoBanner}
-            alt="Folded O&N essentials in cream and beige"
+            src="/images/catalog/on-real-07.jpeg"
+            alt="O&N FITS outdoor photoshoot collection showcase"
             loading="lazy"
             width={1600}
             height={912}
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/50 backdrop-blur-[2px]" />
 
-          <Reveal className="relative mx-auto flex min-h-[440px] max-w-[1400px] items-center px-5 py-16 lg:px-10">
+          <Reveal className="relative mx-auto flex min-h-[460px] max-w-[1400px] items-center px-5 py-16 lg:px-10">
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-1.5 rounded bg-gold/20 px-3 py-1 text-xs font-semibold text-gold-deep">
                 <Tag className="size-3.5" /> VIP Welcome Offer
@@ -601,7 +693,7 @@ function Index() {
         </div>
       </section>
 
-      {/* 8. COMMUNITY LOOKBOOK / INSTAGRAM GRID */}
+      {/* 9. COMMUNITY LOOKBOOK / REAL PHOTOSHOOT GRID */}
       <section className="bg-background py-20 lg:py-24 border-t border-border/70">
         <div className="mx-auto max-w-[1400px] px-5 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -619,7 +711,7 @@ function Index() {
             </a>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {LOOKBOOK_PIECES.map((item, i) => (
               <div
                 key={i}
@@ -630,16 +722,16 @@ function Index() {
                   alt={item.caption}
                   className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gold">
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                  <span className="text-[0.62rem] font-bold uppercase tracking-wider text-gold">
                     {item.tag}
                   </span>
-                  <p className="text-xs text-ivory font-medium mt-1">{item.caption}</p>
+                  <p className="text-[0.68rem] text-ivory font-medium mt-1 line-clamp-2">{item.caption}</p>
                   <Link
                     to="/shop"
-                    className="mt-3 inline-flex items-center gap-1 text-[0.65rem] uppercase tracking-wider text-gold hover:text-ivory transition-colors"
+                    className="mt-2 inline-flex items-center gap-1 text-[0.62rem] uppercase tracking-wider text-gold hover:text-ivory transition-colors"
                   >
-                    Shop This Style &rarr;
+                    Shop Look &rarr;
                   </Link>
                 </div>
               </div>
@@ -648,7 +740,42 @@ function Index() {
         </div>
       </section>
 
-      {/* 9. VIP CONCIERGE & CONTACT STRIP */}
+      {/* 10. FINAL CALL TO ACTION WITH REAL PHOTO BACKGROUND */}
+      <section className="relative overflow-hidden border-t border-border/70">
+        <div className="relative min-h-[380px] sm:min-h-[440px] flex items-center justify-center">
+          <img
+            src="/images/catalog/on-real-31.jpeg"
+            alt="O&N FITS models smiling in the mall campaign"
+            loading="lazy"
+            width={1600}
+            height={900}
+            className="absolute inset-0 h-full w-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-ink/75 backdrop-blur-[2px]" />
+
+          <Reveal className="relative z-10 mx-auto max-w-2xl px-5 py-16 text-center text-white">
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-ink/80 px-4 py-1.5 text-xs text-gold uppercase tracking-widest font-semibold backdrop-blur-md">
+              Define Your Style
+            </span>
+            <h2 className="mt-4 font-serif text-4xl sm:text-6xl text-white font-normal">
+              Find Your Next Look.
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm sm:text-base text-gray-200">
+              Explore our complete catalogue of handcrafted hoodies, custom pants, and luxury streetwear essentials.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Button variant="gold" size="luxlg" asChild>
+                <Link to="/shop">Shop O &amp; N FITS</Link>
+              </Button>
+              <Button variant="lux" size="luxlg" className="border-white/40 text-white hover:bg-white/10" asChild>
+                <Link to="/collections">View Collections</Link>
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 11. VIP CONCIERGE & CONTACT STRIP */}
       <section className="mx-auto max-w-[1400px] px-5 py-16 lg:px-10">
         <Reveal className="border border-border/70 bg-card p-8 text-center sm:p-12 shadow-sm rounded-xs">
           <p className="eyebrow">Personal Assistance</p>
@@ -657,7 +784,7 @@ function Index() {
             Our Nairobi concierge team is on standby 7 days a week for instant assistance via
             WhatsApp, phone, or email.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
             <a
               href={WHATSAPP_URL}
               target="_blank"
@@ -682,7 +809,7 @@ function Index() {
         </Reveal>
       </section>
 
-      {/* 10. NEWSLETTER */}
+      {/* 12. NEWSLETTER */}
       <Newsletter />
     </>
   );

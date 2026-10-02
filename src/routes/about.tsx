@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { GoldFlow } from "@/components/GoldFlow";
 import { Reveal } from "@/components/Reveal";
 import { Watermark } from "@/components/Logo";
-import editorialModel from "@/assets/editorial-model.jpg";
 
 const DESCRIPTION =
   "O&N is built around timeless design, confidence and effortless style — premium modern clothing made in and for Kenya.";
@@ -41,12 +40,12 @@ function AboutPage() {
       <section className="mx-auto grid max-w-[1400px] items-center gap-12 px-5 py-16 lg:grid-cols-2 lg:px-10 lg:py-24">
         <Reveal>
           <img
-            src={editorialModel}
-            alt="An O&N piece worn in natural light"
+            src="/images/catalog/on-real-01.jpeg"
+            alt="O&N FITS models wearing the signature collection in Nairobi"
             loading="lazy"
             width={1200}
             height={1504}
-            className="w-full object-cover"
+            className="w-full object-cover rounded-xs border border-border shadow-md"
           />
         </Reveal>
         <Reveal delay={120} className="max-w-md">
@@ -59,8 +58,8 @@ function AboutPage() {
               their shape.
             </p>
             <p>
-              Each drop is designed in Nairobi and made in small runs — cream, camel and near-black,
-              finished with a discreet gold monogram. Nothing loud, nothing disposable.
+              Each drop is crafted in Nairobi and made in tailored runs — rich camel, royal blue,
+              forest green, warm mustard, and classic black, finished with precision O&amp;N FITS embroidery.
             </p>
           </div>
           <Button variant="gold" size="lux" className="mt-8" asChild>

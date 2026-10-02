@@ -114,7 +114,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-gold" strokeWidth={1.4} />
-                Nairobi, Kenya
+                Eldoret, Kenya
               </li>
             </ul>
           </div>

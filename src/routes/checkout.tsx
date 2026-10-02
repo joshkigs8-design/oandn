@@ -12,12 +12,13 @@ import {
   DELIVERY_FLAT,
   FREE_DELIVERY_THRESHOLD,
   paymentMethods,
+  TILL_NUMBER,
   type PaymentMethod,
 } from "@/lib/checkout";
 import { KENYA_COUNTIES, findCounty } from "@/lib/kenya-locations";
 import { applyDiscount, type DiscountCode } from "@/lib/discounts";
 import { cn } from "@/lib/utils";
-import { getOrderPaymentStatus, placeOrder } from "@/lib/orders.functions";
+import { placeOrder } from "@/lib/orders.functions";
 import { DeliveryButton, useDeliverySequence } from "@/components/DeliveryButton";
 
 export const Route = createFileRoute("/checkout")({
@@ -48,20 +49,22 @@ function CheckoutPage() {
   const [instructions, setInstructions] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payment, setPayment] = useState<PaymentMethod>("mpesa");
+  const [mpesaReceiptNumber, setMpesaReceiptNumber] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState<{
+    id: string;
+    total: number;
+    phone: string;
+    receiptNumber?: string | null;
+  } | null>(null);
 
   // Promo Code State
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<DiscountCode | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
 
-  // STK Push Countdown State
-  const [stkPending, setStkPending] = useState(false);
-  const [stkSecondsLeft, setStkSecondsLeft] = useState(60);
-
   const delivery_anim = useDeliverySequence();
   const submitOrder = useServerFn(placeOrder);
-  const checkStatus = useServerFn(getOrderPaymentStatus);
 
   const standardDelivery =
     subtotal === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FLAT;
@@ -88,23 +91,6 @@ function CheckoutPage() {
     };
   }, []);
 
-  // Live STK push countdown timer
-  useEffect(() => {
-    if (!stkPending) return;
-    setStkSecondsLeft(60);
-    const interval = setInterval(() => {
-      setStkSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setStkPending(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [stkPending]);
-
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoInput.trim()) return;
@@ -126,37 +112,6 @@ function CheckoutPage() {
     toast("Promo code removed");
   };
 
-  const pollPayment = async (orderId: string) => {
-    setStkPending(true);
-    for (let i = 0; i < 20; i++) {
-      await new Promise((r) => setTimeout(r, 4000));
-      const res = await checkStatus({ data: { orderId } });
-      if (res.paymentStatus === "paid") {
-        setStkPending(false);
-        delivery_anim.finish();
-        toast.success("Payment Received — Thank You!", {
-          description: "Your order is confirmed and being prepared for dispatch.",
-        });
-        clear();
-        setTimeout(() => navigate({ to: "/account", search: { tab: "orders" } }), 1200);
-        return;
-      }
-      if (res.paymentStatus === "failed") {
-        setStkPending(false);
-        delivery_anim.fail();
-        toast.error("M-Pesa payment failed", {
-          description: res.message ?? "Transaction was not completed.",
-        });
-        return;
-      }
-    }
-    setStkPending(false);
-    toast.warning("STK Push timed out", {
-      description:
-        "If you already entered your PIN, your order will update automatically in your account.",
-    });
-  };
-
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = {
@@ -168,6 +123,7 @@ function CheckoutPage() {
       town: selectedTown,
       instructions,
       paymentMethod: payment,
+      mpesaReceiptNumber: mpesaReceiptNumber.trim(),
     };
 
     const parsed = checkoutSchema.safeParse(payload);
@@ -202,27 +158,17 @@ function CheckoutPage() {
         },
       });
 
-      if (res.mpesa === "not_required") {
-        delivery_anim.finish();
-        toast.success("Order confirmed!", { description: "Pay rider upon delivery." });
-        clear();
-        setTimeout(() => navigate({ to: "/account", search: { tab: "orders" } }), 1000);
-      } else if (res.mpesa === "prompt_sent") {
-        toast.success("Check your phone", {
-          description: `Enter your M-Pesa PIN to pay ${formatKES(res.total)}.`,
-        });
-        void pollPayment(res.orderId);
-      } else if (res.mpesa === "not_configured") {
-        delivery_anim.finish();
-        toast.warning("Order saved — M-Pesa is in test mode", {
-          description: "Your order is securely registered. Pay the rider upon delivery.",
-        });
-        clear();
-        setTimeout(() => navigate({ to: "/account", search: { tab: "orders" } }), 1200);
-      } else {
-        delivery_anim.fail();
-        toast.error("M-Pesa request failed", { description: res.message });
-      }
+      delivery_anim.finish();
+      clear();
+      setConfirmedOrder({
+        id: res.orderId,
+        total: res.total,
+        phone,
+        receiptNumber: res.receiptNumber,
+      });
+      toast.success("Order Placed Successfully!", {
+        description: "The owner will call you to confirm dispatch, or you can pay via Till 1673504.",
+      });
     } catch (err) {
       delivery_anim.fail();
       toast.error(err instanceof Error ? err.message : "Could not place the order");
@@ -248,20 +194,31 @@ function CheckoutPage() {
       ) : signedIn === null ? (
         <p className="py-20 text-center text-sm text-muted-foreground">Loading checkout details…</p>
       ) : !signedIn ? (
-        <div className="mx-auto mt-10 max-w-md border border-border/70 bg-card p-8 text-center shadow-lg">
-          <h2 className="font-serif text-3xl">Sign in to Order</h2>
+        <div className="mx-auto mt-10 max-w-lg border border-border/70 bg-card p-8 sm:p-10 text-center shadow-lg">
+          <div className="mx-auto grid size-12 place-items-center rounded-full bg-gold/15 text-gold-deep mb-4">
+            <ShieldCheck className="size-6" />
+          </div>
+          <p className="eyebrow text-gold-deep">Customer Authentication Required</p>
+          <h2 className="mt-2 font-serif text-3xl sm:text-4xl">Sign Up Before Checkout</h2>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            Create or sign in to your free O&amp;N FITS account to track delivery live and save your
-            shipping preferences.
+            To guarantee instant M-Pesa payment reconciliation, live Nairobi same-day dispatch updates,
+            and order tracking, all customers must sign up or sign in before placing an order.
           </p>
-          <Button variant="gold" size="luxlg" className="mt-7 w-full" asChild>
-            <Link to="/auth" search={{ next: "/checkout" }}>
-              Sign in / Register
-            </Link>
-          </Button>
-          <Button variant="lux" size="lux" className="mt-3 w-full" asChild>
-            <Link to="/cart">Back to Bag</Link>
-          </Button>
+          <div className="mt-8 grid gap-3">
+            <Button variant="gold" size="luxlg" className="w-full" asChild>
+              <Link to="/auth" search={{ next: "/checkout", mode: "signup" }}>
+                Create Customer Account (Sign Up)
+              </Link>
+            </Button>
+            <Button variant="lux" size="luxlg" className="w-full" asChild>
+              <Link to="/auth" search={{ next: "/checkout", mode: "signin" }}>
+                Already have an account? Sign In
+              </Link>
+            </Button>
+            <Button variant="ghost" size="lux" className="w-full text-muted-foreground" asChild>
+              <Link to="/cart">← Return to Shopping Bag</Link>
+            </Button>
+          </div>
         </div>
       ) : (
         <form onSubmit={onSubmit} noValidate className="mt-10 grid gap-12 lg:grid-cols-[1fr_380px]">
@@ -461,7 +418,7 @@ function CheckoutPage() {
                   <label
                     key={m.id}
                     className={cn(
-                      "flex cursor-pointer items-start gap-4 border p-4 transition-all",
+                      "flex cursor-pointer items-start gap-4 border p-4 transition-all rounded-xs",
                       payment === m.id
                         ? "border-gold bg-gold/10 ring-1 ring-gold/40"
                         : "border-border hover:border-gold/50",
@@ -482,9 +439,91 @@ function CheckoutPage() {
                   </label>
                 ))}
               </div>
+
+              {/* M-Pesa Buy Goods Till 1673504 Interactive Card */}
+              {payment === "mpesa" && (
+                <div className="mt-5 rounded-xs border border-emerald-500/40 bg-emerald-500/5 p-4 sm:p-5 space-y-4 animate-in fade-in">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-500/20 pb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex size-9 items-center justify-center rounded-full bg-emerald-600 font-bold text-sm text-white shadow-sm">
+                        M
+                      </span>
+                      <div>
+                        <span className="text-[0.62rem] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block">
+                          Safaricom Lipa Na M-PESA
+                        </span>
+                        <span className="font-serif text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                          Buy Goods Till: <span className="font-mono text-emerald-700 dark:text-emerald-400">{TILL_NUMBER}</span>
+                        </span>
+                        <span className="block text-[0.65rem] text-muted-foreground">
+                          Registered Business: <strong>O&amp;N FITS</strong>
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(TILL_NUMBER);
+                        toast.success("Till Number 1673504 copied to clipboard!");
+                      }}
+                      className="rounded-xs border border-emerald-600/40 bg-background px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+                    >
+                      Copy Till: 1673504
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground space-y-1.5">
+                    <p>
+                      1. Open <strong>M-PESA</strong> on your phone &gt; Select <strong>Lipa na M-PESA</strong>.
+                    </p>
+                    <p>
+                      2. Select <strong>Buy Goods and Services</strong> &gt; Enter Till Number:{" "}
+                      <strong className="text-foreground font-mono">{TILL_NUMBER}</strong>.
+                    </p>
+                    <p>
+                      3. Enter Exact Amount: <strong className="text-gold-deep font-semibold">{formatKES(finalTotal)}</strong> and enter your PIN.
+                    </p>
+                  </div>
+
+                  <div className="border-t border-emerald-500/20 pt-3">
+                    <label
+                      htmlFor="mpesa-code"
+                      className="block text-[0.62rem] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+                    >
+                      M-PESA Confirmation Code (Optional if paid now)
+                    </label>
+                    <input
+                      id="mpesa-code"
+                      type="text"
+                      value={mpesaReceiptNumber}
+                      onChange={(e) => setMpesaReceiptNumber(e.target.value.toUpperCase())}
+                      placeholder="e.g. SK4829J10K (leave blank if waiting to be called)"
+                      className="h-11 w-full border border-border bg-background px-3.5 font-mono text-xs outline-none focus:border-gold uppercase text-foreground placeholder:normal-case"
+                    />
+                  </div>
+
+                  <div className="rounded-xs bg-gold/10 border border-gold/30 p-3 text-[0.72rem] text-foreground leading-relaxed flex items-start gap-2">
+                    <Info className="size-4 shrink-0 text-gold-deep mt-0.5" />
+                    <span>
+                      <strong>Flexible Checkout:</strong> You can pay now to Till <strong>{TILL_NUMBER}</strong> and enter your code above, OR place your order right now and our owner will call you directly to verify sizes and confirm dispatch payment!
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Call to Confirm Note */}
+              {payment === "cod" && (
+                <div className="mt-5 rounded-xs border border-gold/40 bg-gold/5 p-4 text-xs text-foreground leading-relaxed space-y-1">
+                  <p className="font-semibold text-gold-deep">Owner Will Call You Directly</p>
+                  <p className="text-muted-foreground">
+                    Your order is reserved immediately. The owner will call you on your phone to confirm your exact sizes, fit, and delivery arrangement before dispatch.
+                  </p>
+                </div>
+              )}
+
               <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
                 <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
-                <span>Encrypted 256-bit SSL transaction verified by Safaricom Daraja M-Pesa.</span>
+                <span>Direct Executive Fulfillment • All deliveries dispatched from Nairobi headquarters.</span>
               </div>
             </fieldset>
           </div>
@@ -594,51 +633,60 @@ function CheckoutPage() {
         </form>
       )}
 
-      {/* Live STK Push Countdown Modal */}
-      {stkPending ? (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-ink/70 p-4 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md border border-gold/40 bg-card p-8 text-center shadow-2xl rounded-xs">
-            <div className="mx-auto grid size-20 place-items-center rounded-full bg-emerald-500/15 text-emerald-600">
-              <Clock className="size-10 animate-spin" style={{ animationDuration: "8s" }} />
+      {/* Order Confirmation Modal for Manual Till 1673504 & Owner Call */}
+      {confirmedOrder ? (
+        <div className="fixed inset-0 z-[110] grid place-items-center overflow-y-auto bg-ink/75 p-4 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-xs border border-gold/40 bg-card p-6 sm:p-8 text-center shadow-2xl">
+            <div className="mx-auto grid size-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-600 mb-4">
+              <CheckCircle2 className="size-8" />
             </div>
-
-            <h3 className="mt-5 font-serif text-3xl">STK Push Sent</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Please check your phone. An M-Pesa prompt has been sent to{" "}
-              <strong className="text-foreground">{phone}</strong> for{" "}
-              <strong className="text-gold-deep">{formatKES(finalTotal)}</strong>.
+            <p className="eyebrow text-gold-deep">Order Placed Successfully</p>
+            <h2 className="mt-1 font-serif text-3xl font-bold text-foreground">Thank You For Your Order!</h2>
+            <p className="mt-1 font-mono text-xs text-muted-foreground">
+              Reference: ON-{confirmedOrder.id.slice(0, 8).toUpperCase()}
             </p>
 
-            {/* Countdown seconds indicator */}
-            <div className="mt-6 rounded-lg bg-secondary/80 p-4">
-              <div className="text-2xl font-bold text-foreground font-mono">{stkSecondsLeft}s</div>
-              <p className="mt-1 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-                Waiting for M-Pesa PIN confirmation...
-              </p>
+            <div className="my-6 rounded-xs border border-border/80 bg-secondary/40 p-4 text-left text-xs space-y-2.5">
+              <div className="flex justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Total Order Amount:</span>
+                <span className="font-bold text-foreground text-sm">{formatKES(confirmedOrder.total)}</span>
+              </div>
+              <div className="flex justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Lipa na M-PESA Till:</span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400 font-mono text-sm">{TILL_NUMBER} (O&amp;N FITS)</span>
+              </div>
+              {confirmedOrder.receiptNumber ? (
+                <div className="flex justify-between border-b border-border/60 pb-2">
+                  <span className="text-muted-foreground">M-Pesa Reference:</span>
+                  <span className="font-mono text-emerald-600 font-semibold">{confirmedOrder.receiptNumber}</span>
+                </div>
+              ) : null}
+              <div className="pt-1 text-muted-foreground leading-relaxed">
+                <strong className="block text-foreground mb-1">What Happens Next?</strong>
+                <span>
+                  The owner will call you shortly on <strong className="text-foreground">{confirmedOrder.phone}</strong> to confirm your purchase, check your fit, and arrange delivery. You can also pay right now to Till <strong className="font-mono text-foreground">{TILL_NUMBER}</strong> and wait for your order.
+                </span>
+              </div>
             </div>
 
-            <ol className="mt-6 space-y-2 text-left text-xs text-muted-foreground border-t border-border/70 pt-4">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
-                <span>1. Unlock your phone to see the Safaricom STK prompt.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
-                <span>2. Enter your secret M-Pesa PIN and press OK.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
-                <span>3. Your order will confirm instantly on this screen.</span>
-              </li>
-            </ol>
-
-            <button
-              type="button"
-              onClick={() => setStkPending(false)}
-              className="mt-6 text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
-            >
-              Cancel / Change Payment Method
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                variant="gold"
+                size="lux"
+                className="flex-1"
+                onClick={() => navigate({ to: "/account", search: { tab: "orders" } })}
+              >
+                Track Order &amp; Invoice
+              </Button>
+              <Button
+                variant="lux"
+                size="lux"
+                className="flex-1"
+                onClick={() => navigate({ to: "/shop" })}
+              >
+                Continue Shopping
+              </Button>
+            </div>
           </div>
         </div>
       ) : null}

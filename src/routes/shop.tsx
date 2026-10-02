@@ -52,7 +52,7 @@ function ShopPage() {
   const categories = useCategories();
   const [layoutMode, setLayoutMode] = useState<"standard" | "editorial">("standard");
   const [searchInput, setSearchInput] = useState(search.q ?? "");
-  const [priceCap, setPriceCap] = useState<number>(search.maxPrice ?? 5000);
+  const [priceCap, setPriceCap] = useState<number>(search.maxPrice ?? 7000);
 
   type ShopSearch = z.infer<typeof searchSchema>;
   const setSearch = (patch: Partial<ShopSearch>) =>
@@ -60,7 +60,7 @@ function ShopPage() {
 
   const clearAllFilters = () => {
     setSearchInput("");
-    setPriceCap(5000);
+    setPriceCap(7000);
     navigate({ search: {} });
   };
 
@@ -245,7 +245,7 @@ function ShopPage() {
               <input
                 type="range"
                 min={500}
-                max={5000}
+                max={7000}
                 step={250}
                 value={priceCap}
                 onChange={(e) => {
@@ -257,7 +257,7 @@ function ShopPage() {
               />
               <div className="flex justify-between text-[0.65rem] text-muted-foreground">
                 <span>KES 500</span>
-                <span>KES 5,000+</span>
+                <span>KES 7,000+</span>
               </div>
             </div>
           </FilterGroup>

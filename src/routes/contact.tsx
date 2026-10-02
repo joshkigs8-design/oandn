@@ -135,7 +135,7 @@ function ContactPage() {
           </p>
           <p className="flex items-start gap-3 text-muted-foreground">
             <MapPin className="mt-0.5 size-4 shrink-0 text-gold" strokeWidth={1.4} />
-            Nairobi, Kenya
+            Eldoret, Kenya
           </p>
         </aside>
       </div>

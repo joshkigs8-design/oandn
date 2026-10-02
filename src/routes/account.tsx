@@ -5,10 +5,13 @@ import { z } from "zod";
 import {
   CheckCircle2,
   Clock,
+  Download,
+  FileText,
   Heart,
   LogOut,
   MapPin,
   Package,
+  Printer,
   RotateCcw,
   Shield,
   ShoppingBag,
@@ -90,7 +93,7 @@ function AccountPage() {
   const { items: wishlistItems, removeFromWishlist, clearWishlist } = useWishlist();
   const { addItem, openCart } = useCart();
 
-  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string | undefined } | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
@@ -100,6 +103,130 @@ function AccountPage() {
   const [savedCounty, setSavedCounty] = useState("Nairobi");
   const [savedTown, setSavedTown] = useState("Kilimani");
   const [savedAddress, setSavedAddress] = useState("");
+  const [selectedCustomerInvoice, setSelectedCustomerInvoice] = useState<CustomerOrder | null>(null);
+
+  const handlePrintInvoice = (elementId: string, invoiceNum: string) => {
+    const content = document.getElementById(elementId);
+    if (!content) {
+      window.print();
+      return;
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) {
+      window.print();
+      return;
+    }
+
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <base href="${window.location.origin}/">
+          <title>${invoiceNum} - O&N FITS</title>
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 12mm 15mm;
+            }
+            * {
+              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              color: #111827;
+            }
+            body {
+              background: #ffffff;
+              padding: 10px;
+              font-size: 12px;
+              line-height: 1.45;
+            }
+            .invoice-wrapper {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 15px 0;
+            }
+            th {
+              background: #f4f4f5;
+              padding: 8px 10px;
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              text-align: left;
+              border-bottom: 2px solid #e4e4e7;
+              color: #52525b;
+            }
+            td {
+              padding: 9px 10px;
+              border-bottom: 1px solid #f4f4f5;
+              font-size: 11px;
+            }
+            .border-b { border-bottom: 1px solid #e4e4e7; }
+            .border-t { border-top: 1px solid #e4e4e7; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .font-bold { font-weight: 700; }
+            .font-semibold { font-weight: 600; }
+            .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+            .text-muted { color: #71717a; }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-wrapper">
+            ${content.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    const triggerPrint = () => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 3000);
+    };
+
+    // Ensure all images (including logo.png) are loaded in the iframe before printing
+    const imgs = Array.from(doc.images);
+    if (imgs.length > 0) {
+      let loaded = 0;
+      const onDone = () => {
+        loaded++;
+        if (loaded >= imgs.length) setTimeout(triggerPrint, 150);
+      };
+      imgs.forEach((img) => {
+        if (img.complete) {
+          loaded++;
+        } else {
+          img.onload = onDone;
+          img.onerror = onDone;
+        }
+      });
+      if (loaded >= imgs.length) setTimeout(triggerPrint, 150);
+    } else {
+      setTimeout(triggerPrint, 300);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -266,6 +393,7 @@ function AccountPage() {
               type="button"
               onClick={() =>
                 navigate({
+                  to: "/account",
                   search: { tab: tab.id as "orders" | "wishlist" | "addresses" | "profile" },
                 })
               }
@@ -388,11 +516,22 @@ function AccountPage() {
                           {order.address}, {order.town}, {order.county}
                         </strong>
                       </div>
-                      <div className="text-sm">
-                        <span className="text-muted-foreground mr-2">Total Paid:</span>
-                        <strong className="text-base text-gold-deep">
-                          {formatKES(order.total)}
-                        </strong>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedCustomerInvoice(order)}
+                          className="h-8 text-xs gap-1.5 border-gold/40 text-gold-deep hover:bg-gold/10"
+                        >
+                          <FileText className="size-3.5" />
+                          <span>View Invoice / PDF</span>
+                        </Button>
+                        <div className="text-sm">
+                          <span className="text-muted-foreground mr-1.5">Total:</span>
+                          <strong className="text-base text-gold-deep">
+                            {formatKES(order.total)}
+                          </strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -594,6 +733,277 @@ function AccountPage() {
                 }}
               >
                 Send Password Reset Link
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Customer Commercial Tax Invoice Modal */}
+      {selectedCustomerInvoice ? (
+        <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-ink/75 p-4 backdrop-blur-md animate-in fade-in">
+          <div className="my-8 w-full max-w-3xl rounded-xs border border-border/80 bg-background shadow-2xl overflow-hidden">
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between border-b border-border/80 bg-secondary/50 px-6 py-4">
+              <div className="flex items-center gap-2.5">
+                <FileText className="size-5 text-gold" />
+                <span className="font-serif text-sm font-semibold tracking-wide text-foreground">
+                  Order Invoice — ON-{selectedCustomerInvoice.id.slice(0, 8).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="gold"
+                  size="sm"
+                  onClick={() =>
+                    handlePrintInvoice(
+                      "on-customer-invoice-content",
+                      `INV-ON-${selectedCustomerInvoice.id.slice(0, 8).toUpperCase()}`,
+                    )
+                  }
+                  className="h-8 gap-1.5 text-xs font-medium shadow-sm"
+                >
+                  <Download className="size-3.5" />
+                  <span>Download / Print PDF</span>
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCustomerInvoice(null)}
+                  className="grid size-8 place-items-center rounded-xs text-muted-foreground hover:bg-background hover:text-foreground transition-colors cursor-pointer"
+                  aria-label="Close invoice preview"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Printable Invoice Content */}
+            <div className="p-6 sm:p-8 max-h-[82vh] overflow-y-auto">
+              <div
+                id="on-customer-invoice-content"
+                className="bg-white text-zinc-900 p-8 sm:p-10 border border-zinc-200 rounded-xs shadow-sm font-sans"
+              >
+                {/* Invoice Header */}
+                <div className="flex flex-wrap items-start justify-between gap-6 border-b border-zinc-200 pb-6">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src="/logo.png"
+                      alt="O&N FITS"
+                      className="h-14 w-auto object-contain"
+                    />
+                    <div>
+                      <h2 className="font-serif text-2xl font-bold tracking-tight text-zinc-950">
+                        O&amp;N FITS APPAREL LTD.
+                      </h2>
+                      <p className="text-[0.7rem] uppercase tracking-wider text-zinc-500 font-medium">
+                        Luxury Streetwear &amp; Bespoke Ready-to-Wear
+                      </p>
+                      <p className="text-xs text-zinc-600 mt-1">
+                        Eldoret, Kenya • oandnfits23@gmail.com • +254 112 854 091
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="inline-block rounded-xs bg-zinc-900 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-widest text-white mb-2">
+                      Commercial Tax Invoice
+                    </span>
+                    <p className="font-mono text-sm font-bold text-zinc-900">
+                      INV-ON-{selectedCustomerInvoice.id.slice(0, 8).toUpperCase()}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-0.5">
+                      Date:{" "}
+                      {new Date(selectedCustomerInvoice.created_at).toLocaleDateString("en-KE", {
+                        dateStyle: "medium",
+                      })}
+                    </p>
+                    <div className="mt-2">
+                      <span
+                        className={cn(
+                          "inline-block rounded-full px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider",
+                          selectedCustomerInvoice.payment_status === "paid"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800",
+                        )}
+                      >
+                        Payment: {selectedCustomerInvoice.payment_status.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Billed To / Shipping Address Grid */}
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs border-b border-zinc-200 pb-6">
+                  <div>
+                    <span className="text-[0.65rem] uppercase tracking-widest font-bold text-zinc-400 block mb-1">
+                      Customer / Billed To
+                    </span>
+                    <p className="font-bold text-sm text-zinc-950">
+                      {selectedCustomerInvoice.full_name}
+                    </p>
+                    <p className="text-zinc-700 mt-0.5 font-medium">
+                      Phone: {selectedCustomerInvoice.phone}
+                    </p>
+                    <p className="text-zinc-600">{selectedCustomerInvoice.email}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-[0.65rem] uppercase tracking-widest font-bold text-zinc-400 block mb-1">
+                      Courier Dispatch Address
+                    </span>
+                    <p className="text-zinc-800 font-medium">{selectedCustomerInvoice.address}</p>
+                    <p className="text-zinc-600">
+                      {selectedCustomerInvoice.town}, {selectedCustomerInvoice.county} County
+                    </p>
+                    <p className="text-zinc-500">Republic of Kenya</p>
+                  </div>
+                </div>
+
+                {/* Line Items Table */}
+                <div className="mt-6">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-zinc-200 bg-zinc-50 text-[0.65rem] uppercase tracking-wider font-semibold text-zinc-600">
+                        <th className="py-2.5 px-3">Item Description</th>
+                        <th className="py-2.5 px-3 text-center">Size</th>
+                        <th className="py-2.5 px-3 text-center">Color</th>
+                        <th className="py-2.5 px-3 text-right">Unit Price</th>
+                        <th className="py-2.5 px-3 text-center">Qty</th>
+                        <th className="py-2.5 px-3 text-right">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100">
+                      {(Array.isArray(selectedCustomerInvoice.items)
+                        ? (selectedCustomerInvoice.items as Array<{
+                            name?: string;
+                            size?: string;
+                            color?: string;
+                            quantity?: number;
+                            price?: number;
+                          }>)
+                        : []
+                      ).map((item, idx) => {
+                        const qty = item.quantity ?? 1;
+                        const unitPrice = item.price ?? 0;
+                        return (
+                          <tr key={idx} className="hover:bg-zinc-50/50">
+                            <td className="py-3 px-3 font-medium text-zinc-900">
+                              {item.name || "O&N Apparel Piece"}
+                            </td>
+                            <td className="py-3 px-3 text-center text-zinc-600 font-mono">
+                              {item.size ?? "M"}
+                            </td>
+                            <td className="py-3 px-3 text-center text-zinc-600">
+                              {item.color ?? "Standard"}
+                            </td>
+                            <td className="py-3 px-3 text-right text-zinc-700">
+                              {formatKES(unitPrice)}
+                            </td>
+                            <td className="py-3 px-3 text-center font-bold text-zinc-900">
+                              {qty}
+                            </td>
+                            <td className="py-3 px-3 text-right font-semibold text-zinc-950">
+                              {formatKES(unitPrice * qty)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Financial Totals Breakdown */}
+                <div className="mt-6 flex flex-wrap justify-between items-start gap-6 border-t border-zinc-200 pt-6">
+                  <div className="max-w-xs text-xs space-y-2">
+                    <span className="text-[0.65rem] uppercase tracking-widest font-bold text-zinc-400 block">
+                      Payment Reconciliation
+                    </span>
+                    <div className="rounded-xs bg-zinc-50 p-3 border border-zinc-200/80 space-y-1">
+                      <p className="text-zinc-700">
+                        <span className="font-semibold">Payment:</span>{" "}
+                        {selectedCustomerInvoice.payment_method.toUpperCase() === "MPESA"
+                          ? "M-PESA (Till: 1673504)"
+                          : "Call to Confirm / On Delivery"}
+                      </p>
+                      <p className="text-zinc-700">
+                        <span className="font-semibold">Till Number:</span>{" "}
+                        <strong className="text-emerald-700 font-mono">1673504 (O&amp;N FITS)</strong>
+                      </p>
+                      {selectedCustomerInvoice.mpesa_receipt_number ? (
+                        <p className="text-zinc-900 font-mono">
+                          <span className="font-semibold font-sans">M-Pesa Ref:</span>{" "}
+                          <strong className="text-emerald-700">
+                            {selectedCustomerInvoice.mpesa_receipt_number}
+                          </strong>
+                        </p>
+                      ) : (
+                        <p className="text-zinc-500 italic">
+                          Awaiting payment or owner call confirmation
+                        </p>
+                      )}
+                      <p className="text-zinc-600">
+                        <span className="font-semibold">Dispatch Status:</span>{" "}
+                        {selectedCustomerInvoice.status.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-full sm:w-64 space-y-2 text-xs">
+                    <div className="flex justify-between text-zinc-600">
+                      <span>Subtotal:</span>
+                      <span className="font-medium text-zinc-900">
+                        {formatKES(selectedCustomerInvoice.subtotal || selectedCustomerInvoice.total)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-zinc-600">
+                      <span>Courier Delivery Fee:</span>
+                      <span className="font-medium text-zinc-900">
+                        {selectedCustomerInvoice.delivery_fee > 0
+                          ? formatKES(selectedCustomerInvoice.delivery_fee)
+                          : "Free Delivery"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-zinc-500 text-[0.7rem]">
+                      <span>VAT (16% Included):</span>
+                      <span>
+                        {formatKES(Math.round((selectedCustomerInvoice.total * 16) / 116))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-t-2 border-zinc-900 pt-2 text-base font-bold text-zinc-950">
+                      <span>Grand Total:</span>
+                      <span>{formatKES(selectedCustomerInvoice.total)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Terms & Sign-off */}
+                <div className="mt-8 border-t border-zinc-200 pt-6 text-[0.7rem] text-zinc-500 flex flex-wrap justify-between items-end gap-4">
+                  <div>
+                    <p className="font-semibold text-zinc-700">
+                      Thank you for choosing O&amp;N FITS Kenya.
+                    </p>
+                    <p className="mt-0.5">
+                      Pieces can be exchanged within 7 days in original unworn condition with tags attached.
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-serif italic font-semibold text-zinc-800">
+                      Authorized Executive Dispatch
+                    </p>
+                    <p className="text-[0.65rem] text-zinc-400">O&amp;N FITS • All Rights Reserved</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Bottom Close Bar */}
+            <div className="flex justify-end gap-3 border-t border-border/80 bg-secondary/50 px-6 py-3">
+              <Button
+                variant="lux"
+                size="sm"
+                onClick={() => setSelectedCustomerInvoice(null)}
+              >
+                Close Preview
               </Button>
             </div>
           </div>

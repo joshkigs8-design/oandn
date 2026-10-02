@@ -19,6 +19,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ApiPublicMpesaCallbackRouteImport } from './routes/api/public/mpesa-callback'
@@ -73,6 +74,11 @@ const NewArrivalsRoute = NewArrivalsRouteImport.update({
   path: '/new-arrivals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/mpesa-callback': typeof ApiPublicMpesaCallbackRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/mpesa-callback': typeof ApiPublicMpesaCallbackRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/mpesa-callback': typeof ApiPublicMpesaCallbackRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/new-arrivals'
+    | '/reset-password'
     | '/shop'
     | '/product/$slug'
     | '/api/public/mpesa-callback'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/new-arrivals'
+    | '/reset-password'
     | '/shop'
     | '/product/$slug'
     | '/api/public/mpesa-callback'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/new-arrivals'
+    | '/reset-password'
     | '/shop'
     | '/product/$slug'
     | '/api/public/mpesa-callback'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRoute
   ContactRoute: typeof ContactRoute
   NewArrivalsRoute: typeof NewArrivalsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicMpesaCallbackRoute: typeof ApiPublicMpesaCallbackRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewArrivalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRoute,
   ContactRoute: ContactRoute,
   NewArrivalsRoute: NewArrivalsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicMpesaCallbackRoute: ApiPublicMpesaCallbackRoute,
